@@ -7,8 +7,6 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.services.FacultyService;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/faculty")
@@ -33,17 +31,28 @@ public class FacultyController {
         return ResponseEntity.ok(faculty);
     }
 
+    @GetMapping("{student_id}")
+    public ResponseEntity<Faculty> getFacultyByStudentId(@PathVariable Long student_id) {
+        Faculty faculty = facultyService.getFacultyByStudentId(student_id);
+        if (faculty == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(faculty);
+    }
+
     @GetMapping
-    public ResponseEntity<Collection<Faculty>> getAllFaculty() {
+    public ResponseEntity<Collection<Faculty>> getAllFaculty(@RequestParam(required = false) String nameOrColor) {
+        if (nameOrColor != null && !nameOrColor.isBlank()) {
+            return ResponseEntity.ok(facultyService.findByNameOrColor(nameOrColor));
+        }
         return ResponseEntity.ok(facultyService.getAllFaculties());
     }
 
-    @GetMapping("/color/{colorname}")
-    public ResponseEntity<List<Faculty>> getStudentsByAge(@PathVariable String colorname) {
-        List<Faculty> facultiesByColor = facultyService.getAllFaculties()
+    @GetMapping("/{color}")
+    public ResponseEntity<Collection<Faculty>> getByColor(@PathVariable String color) {
+        Collection<Faculty> facultiesByColor = facultyService.getAllFaculties()
                 .stream()
-                .filter(faculty -> Objects.equals(faculty.getColor(), colorname)).toList();
-
+                .filter(faculty -> faculty.getColor().contains(color)).toList();
         if (facultiesByColor.isEmpty()) {
             return ResponseEntity.notFound().build();
         }

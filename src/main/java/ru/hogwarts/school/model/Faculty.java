@@ -1,10 +1,12 @@
 package ru.hogwarts.school.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 public class Faculty {
@@ -13,13 +15,18 @@ public class Faculty {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String color;
 
+    @ElementCollection(targetClass=String.class)
+    private final Set<String> color = new HashSet<>();
+
+    @OneToMany(mappedBy = "faculty")
+    @JsonIgnore
+    private Collection<Student> students;
     public Faculty() {}
 
-    public Faculty(String name, String color) {
+    public Faculty(String name, Set<String> color) {
         this.name = name;
-        this.color = color;
+        this.color.addAll(color);
     }
 
     @Override
@@ -48,10 +55,6 @@ public class Faculty {
         return id;
     }
 
-//    public void setId(long id) {
-//        this.id = id;
-//    }
-
     public String getName() {
         return name;
     }
@@ -60,11 +63,16 @@ public class Faculty {
         this.name = name;
     }
 
-    public String getColor() {
+    public Set<String> getColor() {
         return color;
     }
 
-    public void setColor(String color) {
-        this.color = color;
+    public void setColor(Set<String> color) {
+        this.color.clear();
+        this.color.addAll(color);
+    }
+
+    public Collection<Student> getStudents() {
+        return students;
     }
 }

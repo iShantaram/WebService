@@ -7,7 +7,6 @@ import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.services.StudentService;
 
 import java.util.Collection;
-import java.util.List;
 
 @RestController
 @RequestMapping("/student")
@@ -38,15 +37,36 @@ public class StudentController {
     }
 
     @GetMapping("/age/{years}")
-    public ResponseEntity<List<Student>> getStudentsByAge(@PathVariable Integer years) {
-        List<Student> ageStudents = studentService.getAllStudents()
+    public ResponseEntity<Collection<Student>> getStudentsByAge(@PathVariable Integer years) {
+        Collection<Student> ageStudents = studentService.getAllStudents()
                 .stream()
                 .filter(student -> student.getAge() == years).toList();
-
         if (ageStudents.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(ageStudents);
+    }
+
+    @GetMapping("/faculty/{id}")
+    public ResponseEntity<Collection<Student>> getStudentsByFaculty(@PathVariable Long id) {
+//        Collection<Student> facultyStudents = studentService.getAllStudents()
+//                .stream()
+//                .filter(student -> student.getFaculty().getId() == id).toList();
+        Collection<Student> facultyStudents = studentService.getStudentsByFaculty(id);
+        if (facultyStudents.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(facultyStudents);
+    }
+
+    @GetMapping("/age-between")
+    public ResponseEntity<Collection<Student>> getStudentsByAgeBetween(@RequestParam Integer min, @RequestParam Integer max) {
+        Collection<Student> ageBetweenStudents = studentService.findByAgeBetween(min, max);
+
+        if (ageBetweenStudents.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(ageBetweenStudents);
     }
 
     @PutMapping
@@ -57,6 +77,15 @@ public class StudentController {
         }
         return ResponseEntity.ok(findStudent);
     }
+
+//    @PutMapping("")
+//    public ResponseEntity<Student> setFacultyForStudent(@RequestBody Integer studentId, Integer facultyId) {
+//        Student findStudent = studentService.findStudent(studentId);
+//        if (findStudent == null) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//        }
+//
+//    }
 
     @DeleteMapping("{id}")
     public Student deleteStudent(@PathVariable Long id) {

@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 public class Faculty {
@@ -15,18 +13,16 @@ public class Faculty {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-
-    @ElementCollection(targetClass=String.class)
-    private final Set<String> color = new HashSet<>();
+    private String color;
 
     @OneToMany(mappedBy = "faculty")
     @JsonIgnore
     private Collection<Student> students;
     public Faculty() {}
 
-    public Faculty(String name, Set<String> color) {
+    public Faculty(String name, String color) {
         this.name = name;
-        this.color.addAll(color);
+        this.color = color;
     }
 
     @Override
@@ -63,16 +59,19 @@ public class Faculty {
         this.name = name;
     }
 
-    public Set<String> getColor() {
+    public String getColor() {
         return color;
     }
 
-    public void setColor(Set<String> color) {
-        this.color.clear();
-        this.color.addAll(color);
+    public void setColor(String color) {
+        this.color = color;
     }
 
     public Collection<Student> getStudents() {
         return students;
+    }
+
+    public void setStudents(Collection<Student> students) {
+        this.students = students;
     }
 }

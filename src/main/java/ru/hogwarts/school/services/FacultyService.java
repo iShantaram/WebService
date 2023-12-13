@@ -1,4 +1,5 @@
 package ru.hogwarts.school.services;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
@@ -8,9 +9,12 @@ import java.util.stream.Collectors;
 
 @Service
 public class FacultyService {
+    @Autowired
     private final FacultyRepository facultyRepository;
-    public FacultyService(FacultyRepository facultyRepository) {
+    private final StudentService studentService;
+    public FacultyService(FacultyRepository facultyRepository, StudentService studentService) {
         this.facultyRepository = facultyRepository;
+        this.studentService = studentService;
     }
     public Faculty get(long id) {
         return facultyRepository.findById(id).get();
@@ -18,51 +22,36 @@ public class FacultyService {
     public Faculty createFaculty(Faculty faculty) {
         return facultyRepository.save(faculty);
     }
+
     public Faculty findFaculty(long id) {
-        return facultyRepository.findById(id).get();
+        return get(id);
     }
+
     public Faculty editFaculty(Faculty faculty) {
         Faculty facultyForUpdate = get(faculty.getId());
         facultyForUpdate.setName(faculty.getName());
         facultyForUpdate.setColor(faculty.getColor());
-        return facultyForUpdate;
+        return facultyRepository.save(facultyForUpdate);
     }
+
     public Faculty deleteFaculty(long id) {
         Faculty facultyForDelete = get(id);
-        facultyRepository.delete(facultyForDelete);
+        facultyRepository.deleteById(id);
         return facultyForDelete;
     }
     public Collection<Faculty> getAllFaculties() {
         return facultyRepository.findAll();
     }
     public Collection<Faculty> getByColor(String color) {
-        return facultyRepository.findAll().stream()
-                .filter(faculty -> faculty.getColor().contains(color))
-                .collect(Collectors.toList());
+        return facultyRepository.findByColorIgnoreCase(color);
     }
     public Collection<Faculty> findByNameOrColor(String nameOrColor) {
         Set<Faculty> faculties = new HashSet<>();
-        faculties.addAll(facultyRepository.findAll().stream()
-                .filter(faculty -> faculty.getColor().contains(nameOrColor))
-                .collect(Collectors.toSet()));
-        faculties.addAll(facultyRepository.findAll().stream()
-                .filter(faculty -> faculty.getName().equals(nameOrColor))
-                .collect(Collectors.toSet()));
         faculties.addAll(facultyRepository.findByNameContainsIgnoreCase(nameOrColor));
         faculties.addAll(facultyRepository.findByColorContainsIgnoreCase(nameOrColor));
         return faculties;
     }
-
-    public Faculty getFacultyByStudentId(long id) {
-        for (Faculty faculty: facultyRepository.findAll()) {
-            for (Student student: faculty.getStudents()) {
-                if (student.getId() == id) {
-                    return faculty;
-                }
-            }
-        }
-        return null;
+    public Collection<Student> getStudents(long id) {
+        return studentService.findByFacultyId(id);
     }
-
-
 }

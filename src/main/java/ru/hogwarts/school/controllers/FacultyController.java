@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.services.FacultyService;
 
 import java.util.Collection;
@@ -31,15 +32,6 @@ public class FacultyController {
         return ResponseEntity.ok(faculty);
     }
 
-    @GetMapping("{student_id}")
-    public ResponseEntity<Faculty> getFacultyByStudentId(@PathVariable Long student_id) {
-        Faculty faculty = facultyService.getFacultyByStudentId(student_id);
-        if (faculty == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(faculty);
-    }
-
     @GetMapping
     public ResponseEntity<Collection<Faculty>> getAllFaculty(@RequestParam(required = false) String nameOrColor) {
         if (nameOrColor != null && !nameOrColor.isBlank()) {
@@ -50,13 +42,24 @@ public class FacultyController {
 
     @GetMapping("/{color}")
     public ResponseEntity<Collection<Faculty>> getByColor(@PathVariable String color) {
-        Collection<Faculty> facultiesByColor = facultyService.getAllFaculties()
-                .stream()
-                .filter(faculty -> faculty.getColor().contains(color)).toList();
+        Collection<Faculty> facultiesByColor = facultyService.getByColor(color);
         if (facultiesByColor.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(facultiesByColor);
+    }
+
+    @GetMapping("/studentsFromFaculty/{id}")
+    public ResponseEntity<Collection<Student>> getStudents(@PathVariable Long id) {
+        Faculty faculty = facultyService.get(id);
+        if (faculty == null) {
+            return ResponseEntity.notFound().build();
+        }
+        Collection<Student> studentsByFaculty = faculty.getStudents();
+        if (studentsByFaculty.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(studentsByFaculty);
     }
 
     @PutMapping

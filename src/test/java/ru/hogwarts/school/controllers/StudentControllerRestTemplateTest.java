@@ -1,22 +1,18 @@
 package ru.hogwarts.school.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import ru.hogwarts.school.model.Student;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class StudentControllerRestTemplateTest {
@@ -113,34 +109,34 @@ class StudentControllerRestTemplateTest {
         long id2 = postedStudent2.getId();
 
         //Начало теста
+        ResponseEntity<List<Student>> responseEntity =
+                restTemplate.exchange(
+                        "http://localhost:" + port + "/student/age-between?min=1&max=17",
+                        HttpMethod.GET,
+                        null,
+                        new ParameterizedTypeReference<List<Student>>() {}
+                );
+        List<Student> students = responseEntity.getBody();
 
-        // Тест не проходит, падает с ошибками
-        // Варианты 2 и 3 по сути одно и тоже.
-        //
-        // org.springframework.web.client.RestClientException: Error while extracting response for type [class [Ljava.lang.Object;] and content type [application/json]
-        // и
-        // org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error:
-        // Cannot deserialize value of type `[Ljava.lang.Object;` from Object value (token `JsonToken.START_OBJECT`)
-        //
-        // Также не понимаю, почему не работает вариант 1 по аналогии с Faculty/Student. Если я указал тип ответа Collection, разве он не должен возвращать коллекцию?
-        // Или с Faculty/Student это работает, потому что Spring знает, как расшифровать Faculty и Student
-        // благодаря аннотации Entity? А Json в Collection он не может?
+        assertNotNull(students);
+        assertEquals(students.size(), 1);
+        assertTrue(students.contains(postedStudent2));
 
         /*
          * Вариант 1
          */
-        Collection<Student> students =
-                restTemplate.getForObject("http://localhost:" + port + "/age-between?min=1&max=17", Collection.class);
-        List<Student> studentsArrList = new ArrayList<>(students);
-        assertNotNull(studentsArrList);
-        assertEquals(studentsArrList.size(), 1);
-        assertTrue(studentsArrList.contains(postedStudent2));
+//        Collection<Student> students =
+//                restTemplate.getForObject("http://localhost:" + port + "/student/age-between?min=1&max=17", Collection.class);
+//        List<Student> studentsArrList = new ArrayList<>(students);
+//        assertNotNull(studentsArrList);
+//        assertEquals(studentsArrList.size(), 1);
+//        assertTrue(studentsArrList.contains(postedStudent2));
 
         /*
          * Вариант 2
          */
 //        ResponseEntity<Student[]> responseEntityStudents =
-//                restTemplate.getForEntity("http://localhost:" + port + "/age-between?min=18&max=30", Student[].class);
+//                restTemplate.getForEntity("http://localhost:" + port + "/student/age-between?min=18&max=30", Student[].class);
 //        Student[] actualStudentsArr = responseEntityStudents.getBody();
 //        assertNotNull(actualStudentsArr);
 //        assertEquals(actualStudentsArr.length, 1);
@@ -150,7 +146,7 @@ class StudentControllerRestTemplateTest {
          * Вариант 3
          */
 //        ResponseEntity<Object[]> responseEntityObjects =
-//                restTemplate.getForEntity("http://localhost:" + port + "/age-between?min=18&max=30", Object[].class);
+//                restTemplate.getForEntity("http://localhost:" + port + "/student/age-between?min=18&max=30", Object[].class);
 //        Object[] objects = responseEntityObjects.getBody();
 //        ObjectMapper mapper = new ObjectMapper();
 //        List<Student> actualStudents = Arrays.stream(objects)

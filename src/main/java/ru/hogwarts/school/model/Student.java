@@ -1,6 +1,6 @@
 package ru.hogwarts.school.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Objects;
 
 @Entity
@@ -11,42 +11,33 @@ public class Student {
     private Long id;
     private String name;
     private int age;
+
     @ManyToOne
-    @JoinColumn(name = "faculty_id")
     private Faculty faculty;
 
-    public Student() {}
-
-    public Student(Long id, String name, int age) {
-        this.id = id;
+    public Student(String name, int age) {
         this.name = name;
         this.age = age;
     }
 
-    @Override
-    public String toString() {
-        return "student{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", age='" + age + '\'' +
-                '}';
+    public Faculty getFaculty() {
+        return faculty;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Student student = (Student) o;
-        return Objects.equals(id, student.id) && Objects.equals(name, student.name) && Objects.equals(age, student.age);
+    public void setFaculty(Faculty faculty) {
+        this.faculty = faculty;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, age);
+    public Student() {
+
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -65,11 +56,25 @@ public class Student {
         this.age = age;
     }
 
-    public Faculty getFaculty() {
-        return faculty;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Student)) return false;
+        Student student = (Student) o;
+        return getAge() == student.getAge() && Objects.equals(getId(), student.getId()) && Objects.equals(getName(), student.getName());
     }
 
-    public void setFaculty(Faculty faculty) {
-        this.faculty = faculty;
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getAge());
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                '}';
     }
 }

@@ -122,39 +122,5 @@ class StudentControllerRestTemplateTest {
         assertEquals(students.size(), 1);
         assertTrue(students.contains(postedStudent2));
 
-        /*
-         * Вариант 1
-         */
-//        Collection<Student> students =
-//                restTemplate.getForObject("http://localhost:" + port + "/student/age-between?min=1&max=17", Collection.class);
-//        List<Student> studentsArrList = new ArrayList<>(students);
-//        assertNotNull(studentsArrList);
-//        assertEquals(studentsArrList.size(), 1);
-//        assertTrue(studentsArrList.contains(postedStudent2));
-
-        /*
-         * Вариант 2
-         */
-//        ResponseEntity<Student[]> responseEntityStudents =
-//                restTemplate.getForEntity("http://localhost:" + port + "/student/age-between?min=18&max=30", Student[].class);
-//        Student[] actualStudentsArr = responseEntityStudents.getBody();
-//        assertNotNull(actualStudentsArr);
-//        assertEquals(actualStudentsArr.length, 1);
-//        assertSame(actualStudentsArr[0], postedStudent2);
-
-        /*
-         * Вариант 3
-         */
-//        ResponseEntity<Object[]> responseEntityObjects =
-//                restTemplate.getForEntity("http://localhost:" + port + "/student/age-between?min=18&max=30", Object[].class);
-//        Object[] objects = responseEntityObjects.getBody();
-//        ObjectMapper mapper = new ObjectMapper();
-//        List<Student> actualStudents = Arrays.stream(objects)
-//                .map(object -> mapper.convertValue(object, Student.class))
-//                .toList();
-//        assertNotNull(actualStudents);
-//        assertEquals(actualStudents.size(), 1);
-//        assertTrue(actualStudents.contains(postedStudent1));
-
     }
 }

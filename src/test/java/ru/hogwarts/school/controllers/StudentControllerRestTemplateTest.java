@@ -1,5 +1,6 @@
 package ru.hogwarts.school.controllers;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import ru.hogwarts.school.model.Student;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,6 +27,13 @@ class StudentControllerRestTemplateTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @BeforeEach
+    void cleanBase() {
+        for (Student s : studentController.getAll()) {
+            studentController.delete(s.getId());
+        }
+    }
 
     @Test
     void createStudent_success() {
@@ -98,6 +107,8 @@ class StudentControllerRestTemplateTest {
     @Test
     void getStudentsByAgeBetween_success() {
         //Подготовка входных данных
+
+
         Student studentForCreate1 = new Student("Garry Potter", 18);
         Student studentForCreate2 = new Student("Germiona Grainger", 17);
 
